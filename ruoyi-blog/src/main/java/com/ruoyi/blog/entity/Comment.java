@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -30,6 +31,11 @@ public class Comment implements Serializable {
     @ApiModelProperty(value = "评论id")
     @TableId("id")
     private Integer id;
+
+    @ApiModelProperty(value = "博客信息id")
+    @TableField("blog_id")
+    private Integer blogId;
+
 
     @ApiModelProperty(value = "评论内容")
     @TableField("content")
@@ -66,6 +72,10 @@ public class Comment implements Serializable {
     @ApiModelProperty(value = "修改时间")
     @TableField("update_time")
     private LocalDateTime updateTime;
+
+    @ApiModelProperty(value = "子评论")
+    @TableField(exist = false)
+    private List<Comment> ChildComment;
 
 
 }

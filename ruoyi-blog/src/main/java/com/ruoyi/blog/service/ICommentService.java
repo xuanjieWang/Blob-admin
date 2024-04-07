@@ -3,6 +3,8 @@ package com.ruoyi.blog.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.blog.entity.Comment;
 
+import java.util.List;
+
 /**
  * <p>
  * 服务类
@@ -13,4 +15,7 @@ import com.ruoyi.blog.entity.Comment;
  */
 public interface ICommentService extends IService<Comment> {
 
+    List<Comment> listComm(Comment comment);
+
+    int addComm(Comment comment);
 }
