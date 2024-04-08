@@ -1,5 +1,6 @@
 package com.ruoyi.blog.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -29,12 +30,12 @@ public class Comment implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "评论id")
-    @TableId("id")
-    private Integer id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     @ApiModelProperty(value = "博客信息id")
     @TableField("blog_id")
-    private Integer blogId;
+    private Long blogId;
 
 
     @ApiModelProperty(value = "评论内容")
@@ -73,7 +74,7 @@ public class Comment implements Serializable {
     @TableField("update_time")
     private LocalDateTime updateTime;
 
-    @ApiModelProperty(value = "子评论")
+    @ApiModelProperty(value = "子评论集合")
     @TableField(exist = false)
     private List<Comment> ChildComment;
 

@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface ICommentService extends IService<Comment> {
 
-    List<Comment> listComm(Comment comment);
+    List<Comment> listComm(Long blogId);
 
-    int addComm(Comment comment);
+    void addComm(Comment comment);
 }

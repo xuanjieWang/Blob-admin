@@ -8,9 +8,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -35,17 +33,18 @@ public class CommentController extends BaseController {
 
 
     @ApiOperation("获取到所有的评论信息")
-    @GetMapping("/listComm")
-    public TableDataInfo listComm(Comment comment) {
+    @GetMapping("/{id}")
+    public TableDataInfo listComm(@PathVariable("id") Long id) {
         startPage();
-        return getDataTable(commentService.listComm(comment));
+        return getDataTable(commentService.listComm(id));
     }
 
     //添加评论信息
     @ApiOperation("添加评论信息")
-    @GetMapping("/addComm")
-    public AjaxResult addComm(Comment comment) {
-        return toAjax(commentService.addComm(comment));
+    @PutMapping("/addComm")
+    public AjaxResult addComm(@RequestBody Comment comment) {
+        commentService.addComm(comment);
+        return AjaxResult.success();
     }
 
 }

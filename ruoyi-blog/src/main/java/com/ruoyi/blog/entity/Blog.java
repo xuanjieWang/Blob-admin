@@ -42,9 +42,12 @@ public class Blog implements Serializable {
     @TableField("image_url")
     private String imageUrl;
 
+    @TableField("common_count")
+    private Integer commonCount;
 
-    @TableField("common_id")
-    private String commonId;
+    @TableField("video_count")
+    private Integer videoCount;
+
 
     @TableField("status")
     private String status;

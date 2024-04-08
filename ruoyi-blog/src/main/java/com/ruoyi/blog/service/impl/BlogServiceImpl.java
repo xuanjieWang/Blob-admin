@@ -9,6 +9,7 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +87,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         String url = saveMarkDown(blog.getText());
         blog.setText(url);
 
+        // 初始化数据
+        blog.setVideoCount(0);
+        blog.setCommonCount(0);
         boolean save = this.save(blog);
         return save ? AjaxResult.success() : AjaxResult.error();
     }
@@ -96,17 +100,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         List<Blog> list = this.list();
 
         for (Blog item : list) {
-            log.info("图片下载--------------------" + item.getImageUrl());
-            if (StringUtils.isNotBlank(item.getImageUrl())) {
-                item.setImage(downloadPic(item.getImageUrl()));
-            }
-            if (StringUtils.isNotBlank(item.getText())) {
-                try {
-                    item.setText(new String(Files.readAllBytes(Paths.get(item.getText()))));
-                } catch (IOException e) {
-                    log.error("md文件读取错误");
-                }
-            }
+            tranData(item);
         }
 
         return list;
@@ -115,7 +109,30 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     @Override
     public Blog getBlog(Long id) {
         Blog blog = this.getById(id);
-        log.info("图片下载--------------------" + blog.getImageUrl());
+        addVideoCount(blog);
+        return tranData(blog);
+    }
+
+    private String downloadPic(String imageUrl) {
+        String base64Image = "";
+        try {
+            File file = new File(imageUrl);
+            byte[] imageBytes = Files.readAllBytes(file.toPath());
+            base64Image = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return base64Image;
+    }
+
+    // 添加浏览量
+    @Async
+    public void addVideoCount(Blog blog) {
+        blog.setVideoCount(blog.getVideoCount() + 1);
+        this.updateById(blog);
+    }
+
+    public Blog tranData(Blog blog) {
         if (StringUtils.isNotBlank(blog.getImageUrl())) {
             blog.setImage(downloadPic(blog.getImageUrl()));
         }
@@ -127,19 +144,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
             }
         }
         return blog;
-    }
-
-    private String downloadPic(String imageUrl) {
-        String base64Image = "";
-        try {
-            File file = new File(imageUrl);
-            byte[] imageBytes = Files.readAllBytes(file.toPath());
-            base64Image = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
-            log.info("图片下载成功--------------------" + imageUrl);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return base64Image;
     }
 
     private String saveMarkDown(String text) {
@@ -169,4 +173,5 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         }
         return url;
     }
+
 }
