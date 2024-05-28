@@ -17,7 +17,7 @@ public class CreateDocument {
         //数据源 这里的配置就跟我们使用Springboot是一样的,如果是PostgreSQL也可以通过currentSchema参数来控制需要生成的schema
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
-        hikariConfig.setJdbcUrl("jdbc:mysql://localhost:3306/ys_ems?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8");
+        hikariConfig.setJdbcUrl("jdbc:mysql://localhost:3306/blog?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8");
         hikariConfig.setUsername("root");
         hikariConfig.setPassword("root");
         //设置可以获取tables remarks信息
@@ -36,17 +36,13 @@ public class CreateDocument {
                 //生成模板实现
                 .produceType(EngineTemplateType.freemarker)
                 //自定义文件名称
-                .fileName("EMS后端数据库文档").build();
+                .fileName("博客后端数据表").build();
         // 生成表配置,可以自由控制想要生成的数据表,我这边仅生成3张表用作示例
         ProcessConfig processConfig = ProcessConfig.builder()
                 //指定生成逻辑、当存在指定表、指定表前缀、指定表后缀时，将生成指定表，其余表不生成、并跳过忽略表配置
                 //根据名称指定表生成
                 .designatedTableName(new ArrayList<String>() {{
                     add("t_heap");
-                    add("t_heap_online_data");
-                    add("t_cell_online_data");
-                    add("t_alarm_parameter");
-                    add("t_alarm_online_data");
                 }})
                 //根据表前缀生成
                 .designatedTablePrefix(new ArrayList<>())

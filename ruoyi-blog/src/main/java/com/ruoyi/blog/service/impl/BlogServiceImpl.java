@@ -1,10 +1,13 @@
 package com.ruoyi.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.blog.entity.Blog;
 import com.ruoyi.blog.mapper.BlogMapper;
 import com.ruoyi.blog.service.IBlogService;
+import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.slf4j.Logger;
@@ -75,16 +78,45 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         return url + suffix + ".jpg";
     }
 
+    public static String downloadPic(String imageUrl) {
+        String base64Image = "";
+        try {
+            File file = new File(imageUrl);
+            byte[] imageBytes = Files.readAllBytes(file.toPath());
+            base64Image = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
+        } catch (Exception e) {
+            log.error("图片文件读取错误: ", imageUrl);
+        }
+        return base64Image;
+    }
+
+    public static String downloadPicBase64(String imageUrl) {
+        String base64Image = "";
+        try {
+            File file = new File(imageUrl);
+            byte[] imageBytes = Files.readAllBytes(file.toPath());
+            base64Image = Base64.getEncoder().encodeToString(imageBytes);
+        } catch (Exception e) {
+            log.error("图片文件读取错误: ", imageUrl);
+        }
+        return base64Image;
+    }
+
+
     @Override
     public AjaxResult addBlog(Blog blog) {
         blog.setCreateTime(DateUtils.getNowDate());
 
+        blog.setType(blog.getType().toLowerCase());
+
         //存储图片，将base64转换为图片存储到本地，数据库存储路径
-        String imageUrl = saveImage(blog.getImage());
-        blog.setImageUrl(imageUrl);
+        if (StringUtils.isNotBlank(blog.getImage())) {
+            String imageUrl = saveImage(blog.getImage());
+            blog.setImageUrl(imageUrl);
+        }
 
         //存储markdown文件
-        String url = saveMarkDown(blog.getText());
+        String url = saveMarkDown(blog.getTitle(), blog.getText());
         blog.setText(url);
 
         // 初始化数据
@@ -97,7 +129,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
     // 分页查询
     @Override
     public List<Blog> listBlog(Blog blog) {
-        List<Blog> list = this.list();
+        // 根据时间查询出
+        LambdaQueryWrapper<Blog> lqw = new LambdaQueryWrapper<>();
+        lqw.orderByDesc(Blog::getCreateTime);
+        List<Blog> list = this.list(lqw);
+
+        // 根据标签获取文章
+        lqw.eq(StringUtils.isNotBlank(blog.getType()), Blog::getType, blog.getType());
 
         for (Blog item : list) {
             tranData(item);
@@ -113,16 +151,25 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         return tranData(blog);
     }
 
-    private String downloadPic(String imageUrl) {
-        String base64Image = "";
-        try {
-            File file = new File(imageUrl);
-            byte[] imageBytes = Files.readAllBytes(file.toPath());
-            base64Image = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imageBytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return base64Image;
+    @Override
+    @DataSource(value = DataSourceType.LINUX)
+    public List<Blog> selectAllLinuxBlog() {
+        LambdaQueryWrapper<Blog> lqw = new LambdaQueryWrapper<>();
+        lqw.orderByAsc(Blog::getCreateTime);
+        return this.list(lqw);
+    }
+
+    @Override
+    @DataSource(value = DataSourceType.LINUX)
+    public void insertLinuxBlog(Blog blog) {
+        this.save(blog);
+    }
+
+    @Override
+    public List<Blog> selectAllBlog() {
+        LambdaQueryWrapper<Blog> lqw = new LambdaQueryWrapper<>();
+        lqw.orderByAsc(Blog::getCreateTime);
+        return this.list(lqw);
     }
 
     // 添加浏览量
@@ -146,7 +193,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         return blog;
     }
 
-    private String saveMarkDown(String text) {
+    private String saveMarkDown(String title, String text) {
         String url = null;
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win")) {
@@ -163,7 +210,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         String suffix = df.format(new Date());
-        url = url + suffix + ".md";
+        url = url + title + suffix + ".md";
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(url))) {
             writer.write(text);

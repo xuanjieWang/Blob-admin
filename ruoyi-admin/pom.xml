@@ -60,9 +60,19 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
+
+
+        <!--博客首页-->
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-blog</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!--微信支付-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>wx</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

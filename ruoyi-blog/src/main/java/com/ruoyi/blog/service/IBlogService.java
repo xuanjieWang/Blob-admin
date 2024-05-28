@@ -12,4 +12,10 @@ public interface IBlogService extends IService<Blog> {
     List<Blog> listBlog(Blog blog);
 
     Blog getBlog(Long id);
+
+    List<Blog> selectAllBlog();
+
+    List<Blog> selectAllLinuxBlog();
+
+    void insertLinuxBlog(Blog blog);
 }
