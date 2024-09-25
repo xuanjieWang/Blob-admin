@@ -15,6 +15,10 @@ public class BlogController extends BaseController {
     @Autowired
     public IBlogService IBlogService;
 
+    public static void main(String[] args) {
+
+    }
+
     @ApiOperation("新增文章")
 //    @PreAuthorize("@ss.hasPermi('blog:data:add')")
 //    @Log(title = "新增文章", businessType = BusinessType.INSERT)
@@ -36,5 +40,4 @@ public class BlogController extends BaseController {
     public AjaxResult getBlog(@PathVariable("id") Long id) {
         return AjaxResult.success(IBlogService.getBlog(id));
     }
-
 }

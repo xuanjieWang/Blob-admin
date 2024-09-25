@@ -65,11 +65,11 @@ spring:
         url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
         password: root
-      linux:
-        enabled: true
-        url: jdbc:mysql://134.175.61.30:3306/blog?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-        username: root
-        password: root1
+      #      linux:
+      #        enabled: true
+      #        url: jdbc:mysql://134.175.61.30:3306/blog?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      #        username: root
+      #        password: root1
       # 从库数据源
       slave:
         # 从数据源开关/默认关闭
